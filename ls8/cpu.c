@@ -69,16 +69,16 @@ void cpu_load(char *filename, struct cpu *cpu)
 //TRACE WHAT IS HAPPENING AT CPU LEVEL
 void trace(struct cpu *cpu)
 {
-  printf("%02X | ", cpu->pc);
+  printf("%d | ", cpu->pc);
 
-  printf("%02X %02X %02X |",
+  printf("%d %d %d |",
          cpu_ram_read(cpu, cpu->pc),
          cpu_ram_read(cpu, cpu->pc + 1),
          cpu_ram_read(cpu, cpu->pc + 2));
 
   for (int i = 0; i < 8; i++)
   {
-    printf(" %02X", cpu->reg[i]);
+    printf(" %d", cpu->reg[i]);
   }
 
   printf("\n");
@@ -148,6 +148,10 @@ void alu(struct cpu *cpu, enum alu_op op, unsigned char regA, unsigned char regB
     else if (cpu->reg[regA] > cpu->reg[regB])
     {
       cpu->FL = 0b00000010;
+    }
+    else if (cpu->reg[regA] != cpu->reg[regB])
+    {
+      cpu->FL = 0b00000000;
     }
     break;
   }
@@ -232,12 +236,20 @@ void cpu_run(struct cpu *cpu)
       {
         cpu->pc = cpu->reg[operandA];
       }
+      else
+      {
+        cpu->pc += 2;
+      }
       break;
 
     case JNE:
-      if (cpu->FL == 00000000)
+      if (cpu->FL != 00000001)
       {
         cpu->pc = cpu->reg[operandA];
+      }
+      else
+      {
+        cpu->pc += 2;
       }
       break;
 
