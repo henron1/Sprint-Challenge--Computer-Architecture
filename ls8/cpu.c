@@ -4,6 +4,7 @@
 #include "string.h"
 
 #define DATA_LEN 6
+#define SP 7
 
 // /**
 // Helper function to write a value to the specified index in RAM
@@ -135,7 +136,20 @@ void alu(struct cpu *cpu, enum alu_op op, unsigned char regA, unsigned char regB
     cpu->reg[regA] = cpu->reg[regA] * cpu->reg[regB];
     break;
 
-    // TODO: implement more ALU ops
+  case ALU_CMP:
+    if (cpu->reg[regA] == cpu->reg[regB])
+    {
+      cpu->FL = 0b00000001;
+    }
+    else if (cpu->reg[regA] < cpu->reg[regB])
+    {
+      cpu->FL = 0b00000100;
+    }
+    else if (cpu->reg[regA] > cpu->reg[regB])
+    {
+      cpu->FL = 0b00000010;
+    }
+    break;
   }
 }
 
@@ -176,7 +190,7 @@ void cpu_run(struct cpu *cpu)
     // 5. Do whatever the instruction should do according to the spec.
 
     // 6. Move the PC to the next instruction.
-
+    trace(cpu);
     switch (IR)
     {
     case HLT:
@@ -203,6 +217,28 @@ void cpu_run(struct cpu *cpu)
     case POP:
       cpu->reg[operandA] = cpu->ram[cpu->reg[SP]];
       cpu->reg[SP]++;
+      break;
+
+    case CMP:
+      alu(cpu, ALU_CMP, operandA, operandB);
+      break;
+
+    case JMP:
+      cpu->pc = cpu->reg[operandA];
+      break;
+
+    case JEQ:
+      if (cpu->FL == 00000001)
+      {
+        cpu->pc = cpu->reg[operandA];
+      }
+      break;
+
+    case JNE:
+      if (cpu->FL == 00000000)
+      {
+        cpu->pc = cpu->reg[operandA];
+      }
       break;
 
     default:

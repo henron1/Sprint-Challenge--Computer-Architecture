@@ -20,8 +20,9 @@ struct cpu
 // ALU operations
 enum alu_op
 {
-  ALU_MUL
+  ALU_MUL,
   // Add more here
+  ALU_CMP
 };
 
 // Instructions
@@ -37,6 +38,10 @@ enum alu_op
 #define SP 7
 #define PUSH 0b01000101
 #define POP 0b01000110
+#define CMP 0b10100111
+#define JMP 0b01010100
+#define JNE 0b01010110
+#define JEQ 0b01010101
 // Function declarations
 
 extern void cpu_load(char *filename, struct cpu *cpu);
